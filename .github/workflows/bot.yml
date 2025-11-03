@@ -4,9 +4,10 @@ on:
   schedule:
     - cron: '0 9 * * *'
   workflow_dispatch:
- 
+
 permissions:
   contents: write
+
 jobs:
   bot:
     runs-on: ubuntu-latest
@@ -42,14 +43,6 @@ jobs:
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
         run: python3 bot_simple.py
-      
-      - name: Save to GitHub
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "Bot MallorKayak"
-          git add predicciones/ validaciones/ 2>/dev/null || true
-          git commit -m "📊 Guardadas predicciones y validaciones - $(date)" || true
-          git push
       
       - name: Log execution
         run: echo "✅ Bot completado a las $(date)"
