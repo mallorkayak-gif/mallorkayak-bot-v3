@@ -1,16 +1,14 @@
-name: 🎣 MallorKayak Weather Bot + Validator
+name: 🎣 MallorKayak Weather Bot
 
 on:
   schedule:
     - cron: '0 9 * * *'
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   bot:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
       
@@ -22,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
       
-      - name: Run validator (comparar predicciones)
+      - name: Run validator
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -30,19 +28,16 @@ jobs:
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
         run: python3 bot_validator.py || true
       
-      - name: Run predictor (guardar predicciones)
+      - name: Run predictor
         env:
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
         run: python3 bot_predictions.py || true
       
-      - name: Run bot (generar reporte)
+      - name: Run bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
         run: python3 bot_simple.py
-      
-      - name: Log execution
-        run: echo "✅ Bot completado a las $(date)"
