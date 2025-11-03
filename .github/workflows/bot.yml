@@ -1,4 +1,4 @@
-name: 🎣 MallorKayak Weather Bot (Versión Simplificada)
+name: 🎣 MallorKayak Weather Bot + Validator
 
 on:
   schedule:
@@ -19,13 +19,26 @@ jobs:
       - name: Install dependencies
         run: pip install requests
       
-      - name: Run bot (sin Open-Meteo)
+      - name: Run validator
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
-        run: python3 bot_simple.py
+        run: python3 bot_validator.py
       
-      - name: Log execution
-        run: echo "✅ Bot ejecutado a las $(date)"
+      - name: Run predictor
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+        run: python3 bot_predictions.py
+      
+      - name: Save predictions and validations
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Bot MallorKayak"
+          git add predicciones/ validaciones/ 2>/dev/null || true
+          git commit -m "📊 Guardadas predicciones y validaciones - $(date)" || true
+          git push
