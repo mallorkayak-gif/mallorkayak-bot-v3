@@ -19,26 +19,35 @@ jobs:
       - name: Install dependencies
         run: pip install requests
       
-      - name: Run validator
+      - name: Run validator (comparar predicciones)
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
-        run: python3 bot_validator.py
+        run: python3 bot_validator.py || true
       
-      - name: Run predictor
+      - name: Run predictor (guardar predicciones)
+        env:
+          OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+        run: python3 bot_predictions.py || true
+      
+      - name: Run bot (generar reporte)
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENWEATHER_KEY: ${{ secrets.OPENWEATHER_KEY }}
           WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
-        run: python3 bot_predictions.py
+        run: python3 bot_simple.py
       
-      - name: Save predictions and validations
+      - name: Save to GitHub
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Bot MallorKayak"
           git add predicciones/ validaciones/ 2>/dev/null || true
           git commit -m "📊 Guardadas predicciones y validaciones - $(date)" || true
           git push
+      
+      - name: Log execution
+        run: echo "✅ Bot completado a las $(date)"
